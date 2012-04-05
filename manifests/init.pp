@@ -1,31 +1,32 @@
-class vim {
+define vim($git_repo="git://github.com/heim/dotvim.git") {
   
-  Package["git-core"] -> Exec["clone-vim-files"] -> Exec["update-vim-files"] -> File["/home/vagrant/.vimrc"]
+  Package["git-core"] -> Exec["clone-vim-files-for-$name"] -> File["/home/$name/.vimrc"]
 
   package { "git-core":
     ensure => present,
   }
 
-  exec { "clone-vim-files":
+  exec { "clone-vim-files-for-$name":
     path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
-    user => "vagrant",
-    cwd => "/home/vagrant",
-    command => "git clone git://github.com/heim/dotvim.git .vim",
-    creates => "/home/vagrant/.vim",
+    user => "$name",
+    cwd => "/home/$name",
+    command => "git clone $git_repo .vim",
+    creates => "/home/$name/.vim",
   }
 
-  exec { "update-vim-files":
-    path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
-    user => "vagrant", 
-    cwd => "/home/vagrant/.vim",
-    command => "git pull origin master",
-  }
 
-  file { "/home/vagrant/.vimrc":
+  file { "/home/$name/.vimrc":
     ensure => link,
-    target => "/home/vagrant/.vim/vimrc",
-    owner => "vagrant",
+    target => "/home/$name/.vim/vimrc",
+    owner => "$name",
   }
 
+  exec { "update-vim-files-for-$name":
+    path => "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin",
+    user => "$name", 
+    cwd => "/home/$name/.vim",
+    command => "git pull origin master",
+    require => Exec["clone-vim-files-for-$name"],
+  }
 
 }
