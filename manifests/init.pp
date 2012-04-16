@@ -1,3 +1,4 @@
+#TODO init submodules after checkout
 class dotvim {
 	define vim($git_repo="git://github.com/heim/dotvim.git") {
 
@@ -14,8 +15,9 @@ class dotvim {
 			     user => "$name",
 			     cwd => "/home/$name",
 			     command => "git clone $git_repo .vim",
-			     creates => "/home/$name/.vim",
+			     creates => "/home/$name/.vim/.git",
 		}
+
 
 
 		file { "/home/$name/.vimrc":
